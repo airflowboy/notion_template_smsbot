@@ -23,7 +23,7 @@ function sendLinkToPhoneNumber(phoneNumber) {
       to: phoneNumber, // 수신 휴대폰 번호, 나중에 phoneNumber로 변경해야됨.
 
 
-      from: "01072097050", // 발신 번호 (환경 변수 또는 직접 할당, 예: '01012345678')
+      from: process.env.PHONE_NUMBER, // 발신 번호 (환경 변수 또는 직접 할당, 예: '01012345678')
       text: `
 안녕하세요, 사장님.
 만월상회입니다.

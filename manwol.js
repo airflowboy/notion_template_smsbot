@@ -8,12 +8,13 @@ const { default: CoolsmsMessageService } = require('coolsms-node-sdk');
 // 환경변수에서 API 키와 시크릿을 가져옵니다.
 const COOLSMS_API_KEY = process.env.COOLSMS_API_KEY; 
 const COOLSMS_API_SECRET = process.env.COOLSMS_API_SECRET;
-const IMWEB_API_KEY = process.env.IMWEB_API_KEY;
-const IMWEB_API_SECRET = process.env.IMWEB_API_SECRET;
+const IMWEB_MANWOL_API_KEY = process.env.IMWEB_MANWOL_API_KEY;
+const IMWEB_MANWOL_API_SECRET = process.env.IMWEB_MANWOL_API_SECRET;
+
 
 const messageService = new CoolsmsMessageService(COOLSMS_API_KEY, COOLSMS_API_SECRET);
 
-let orderTime = 1738717361;
+let orderTime = 1738737098;
 let orderList;
 
 // SMS로 링크 전송하는 함수 (CoolSMS 사용)
@@ -50,8 +51,8 @@ awake 달력과 함께, 한 해동안 멋진 영감이 가득하길 바랍니다
 async function fetchProductsViaCurl() {
     // imweb API 인증 요청 시 환경변수로부터 key와 secret를 설정합니다.
     const response = await axios.post('https://api.imweb.me/v2/auth', {
-        key: IMWEB_API_KEY,
-        secret: IMWEB_API_SECRET
+        key: IMWEB_MANWOL_API_KEY,
+        secret: IMWEB_MANWOL_API_SECRET
     });
 
     const data = response.data;
@@ -68,13 +69,22 @@ async function fetchProductsViaCurl() {
         try {
             const jsonData = JSON.parse(stdout);
             orderList = jsonData['data']['list'];
+            
+            // orderList를 JSON 파일로 저장합니다.
+            // fs.writeFile('manwol_orderList.json', JSON.stringify(orderList, null, 2), (err) => {
+            //     if (err) {
+            //         console.error("orderList 파일 저장 중 오류 발생:", err);
+            //     } else {
+            //         console.log("orderList 파일이 성공적으로 저장되었습니다.");
+            //     }
+            // });
+
             if(orderTime === jsonData['data']['list'][0]['order_time']) {
                 console.log("no recent order");
             }else {
                 orderList = jsonData['data']['list'].filter(item => item['order_time'] > orderTime);
 
                 orderList.forEach(item => {
-                    console.log(item);
                     cmd = `curl -X GET -H "Content-Type: application/json" -H "access-token: ${accessToken}" -d '{"version":"latest"}' https://api.imweb.me/v2/shop/orders/${item['order_no']}/prod-orders`;
                     exec(cmd, (error, stdout, stderr) => {
                         if (error) {

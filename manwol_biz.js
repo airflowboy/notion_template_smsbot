@@ -14,7 +14,7 @@ const IMWEB_BIZ_API_SECRET = process.env.IMWEB_BIZ_API_SECRET;
 
 const messageService = new CoolsmsMessageService(COOLSMS_API_KEY, COOLSMS_API_SECRET);
 
-let orderTime = 1738823596;
+let orderTime = 1738833230;
 let orderList;
 
 // SMS로 링크 전송하는 함수 (CoolSMS 사용)
@@ -73,14 +73,14 @@ async function fetchProductsViaCurl() {
             const jsonData = JSON.parse(stdout);
             orderList = jsonData['data']['list'];
            
-            // fs.writeFile('manwol_biz_orderList.json', JSON.stringify(orderList, null, 2), (err) => {
-            //     if (err) {
-            //         console.error("orderList 파일 저장 중 오류 발생:", err);
-            //     } else {
+            fs.writeFile('manwol_biz_orderList.json', JSON.stringify(orderList, null, 2), (err) => {
+                if (err) {
+                    console.error("orderList 파일 저장 중 오류 발생:", err);
+                } else {
 
-            //         console.log("orderList 파일이 성공적으로 저장되었습니다.");
-            //     }
-            // });
+                    console.log("orderList 파일이 성공적으로 저장되었습니다.");
+                }
+            });
             if(orderTime === jsonData['data']['list'][0]['order_time']) {
                 console.log("no recent order");
             }else {
@@ -96,9 +96,11 @@ async function fetchProductsViaCurl() {
                         }
     
                         const jsonData = JSON.parse(stdout);
+                       
                         jsonData['data'].forEach(item => {
                             item['items'].forEach(elem => {
                                 if (elem['prod_no'] === 236 || elem['prod_no'] === 235 || elem['prod_no'] === 327) {
+                                    console.log("문자전송");
                                     sendLinkToPhoneNumber(callNumber);
                                 } else {
                                     console.log("not 236, 235, 327");
